@@ -32,9 +32,8 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           password: ${{ secrets.VPS_PASSWORD }}
-          source: "frontend/dist/*,backend/*"
+          source: "frontend/dist,backend"
           target: "/var/www/html/sanskar_school"
-          strip_components: 1
 
       - name: Post-deployment SSH Commands
         uses: appleboy/ssh-action@v1.0.3
@@ -43,8 +42,8 @@ jobs:
           username: ${{ secrets.VPS_USERNAME }}
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
-            cd /var/www/html/sanskar_school
+            cd /var/www/html/sanskar_school/backend
             # Install backend dependencies
-            npm install --prefix backend --production
+            npm install --production
             # Restart backend using PM2
-            pm2 restart sanskar_backend || pm2 start backend/server.js --name "sanskar_backend"
+            pm2 restart sanskar_backend || pm2 start server.js --name "sanskar_backend"

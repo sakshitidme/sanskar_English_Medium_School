@@ -118,7 +118,6 @@ const Navbar = () => {
                   className="absolute top-full left-0 pt-4 w-64 z-50"
                 >
                     <div className="bg-white/60 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] rounded-2xl border border-white/40 overflow-hidden py-2 ring-1 ring-black/5">
-                      <DropdownItem to="/about" closeMenu={closeAbout}>About School</DropdownItem>
                       <DropdownItem to="/about/educators" closeMenu={closeAbout} icon="👩‍🏫">Our Educators</DropdownItem>
                       <DropdownItem to="/about/trust" closeMenu={closeAbout} icon="🤝">Trust</DropdownItem>
                       <DropdownItem to="/about/infrastructure" closeMenu={closeAbout} icon="🏫">Infrastructure</DropdownItem>
@@ -239,7 +238,6 @@ const Navbar = () => {
 
             {aboutOpen && (
               <div className="pl-4 space-y-3 border-l-2 border-[#FFC107] py-1">
-                <MobileLink to="/about" onClick={() => setMenuOpen(false)} small>About School</MobileLink>
                 <MobileLink to="/about/educators" onClick={() => setMenuOpen(false)} small>Our Educators</MobileLink>
                 <MobileLink to="/about/trust" onClick={() => setMenuOpen(false)} small>Trust</MobileLink>
                 <MobileLink to="/about/infrastructure" onClick={() => setMenuOpen(false)} small>Infrastructure</MobileLink>

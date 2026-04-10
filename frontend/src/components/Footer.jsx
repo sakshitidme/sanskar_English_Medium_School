@@ -125,7 +125,6 @@ const Footer = () => {
             </h4>
             <ul className="space-y-4 flex-grow">
               {[
-                { name: 'About School', path: '/about', icon: Info },
                 { name: 'Our Educators', path: '/about/educators', icon: Users },
                 { name: 'Infrastructure', path: '/about/infrastructure', icon: Building },
                 { name: 'Admissions', path: '/admission', icon: ClipboardCheck }

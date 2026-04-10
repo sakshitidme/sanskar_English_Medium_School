@@ -3,7 +3,6 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
 import Home from "./pages/Home";
-import About from "./pages/About";
 import Educators from "./pages/Educators";
 import Infrastructure from "./pages/Infrastructure";
 import Trust from "./pages/Trust";
@@ -82,7 +81,6 @@ const App = () => {
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
           <Route path="/about/educators" element={<Educators />} />
           <Route path="/about/infrastructure" element={<Infrastructure />} />
           <Route path="/about/trust" element={<Trust />} />

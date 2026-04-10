@@ -7,7 +7,6 @@ import SEO from "../components/SEO";
 const Sitemap = () => {
   const links = [
     { title: "Home", path: "/" },
-    { title: "About Us", path: "/about" },
     { title: "Events", path: "/events" },
     { title: "Gallery", path: "/gallery" },
     { title: "Contact Us", path: "/contact" },

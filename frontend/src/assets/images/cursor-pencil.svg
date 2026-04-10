@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- Outer Border Circle -->
+  <circle cx="16" cy="16" r="15" fill="#1A4D8D" />
+  <!-- Inner White Circle -->
+  <circle cx="16" cy="16" r="13" fill="#FFFFFF" />
+  <!-- Pencil Group - Rotated to point top-left (approx -135 degrees from vertical or similar to align diagonally) -->
+  <!-- Original was -45, pointing bottom-right-ish. We want the tip at top-left. -->
+  <g transform="translate(16, 16) rotate(-135) translate(-16, -16)">
+    <!-- Pencil Body -->
+    <rect x="14" y="9" width="4" height="10" fill="#FFC107" />
+    <!-- Eraser -->
+    <rect x="14" y="7" width="4" height="2" fill="#E91E63" />
+    <!-- Wood section -->
+    <polygon points="14,19 18,19 16,24" fill="#fbbf24" />
+    <!-- Graphite Tip -->
+    <path d="M15.5 23.5L16.5 23.5L16 24.5Z" fill="#000" />
+  </g>
+</svg>

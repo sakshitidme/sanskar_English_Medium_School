@@ -1,16 +1,46 @@
- @import "tailwindcss";
+@import "tailwindcss";
 
-/* ✅ Theme variables MUST be inside :root */
+/* =========================
+   SCHOOL THEME VARIABLES
+   ========================= */
+@theme {
+  --color-podar-blue: #0E4D92;
+  --color-podar-dark-blue: #0b2a4a;
+  --color-podar-hero: #1A4D8D;
+  --color-podar-yellow: #FFC107;
+  --color-podar-orange: #FF9800;
+  --color-podar-red: #E91E63;
+  --color-podar-green: #4CAF50;
+  --color-podar-cyan: #00BCD4;
+}
+
 :root {
-  --color-green-main: #00a884;
-  --color-green-light: #4fb48f;
-  --color-yellow: #fbbf24;
-} 
+  /* Primary Colors */
+  --color-primary: #0E4D92;
+  --color-secondary: #FFC107;
+  --color-accent: #E91E63;
+
+  /* Backgrounds */
+  --color-bg-main: #FFFFFF;
+  --color-bg-soft: #F0F9FF; /* Very light blue */
+  --color-bg-warm: #FFFDE7; /* Very light yellow */
+
+  /* Text */
+  --color-text-main: #333333;
+  --color-text-muted: #666666;
+  --color-text-light: #FFFFFF;
+}
+
+/* Custom Cursors */
+body {
+  cursor: auto;
+  overflow-x: hidden;
+}
 
 
- 
-
-
+/* =========================
+   ANIMATIONS
+   ========================= */
 @keyframes floatSlow {
   0%, 100% {
     transform: translateY(0) scale(1);
@@ -20,7 +50,7 @@
   }
 }
 
- @keyframes wordFade {
+@keyframes wordFade {
   from {
     opacity: 0;
     transform: translateY(20px);

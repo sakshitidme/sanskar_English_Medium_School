@@ -26,14 +26,25 @@ jobs:
         working-directory: ./frontend
         run: npm run build
 
-      - name: Deploy to VPS via SCP
+      - name: Deploy Frontend to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           password: ${{ secrets.VPS_PASSWORD }}
-          source: "frontend/dist,backend"
-          target: "/var/www/html/sanskar_school"
+          source: "frontend/dist/*"
+          target: "/var/www/bksanskar.in/public_html"
+          strip_components: 2
+
+      - name: Deploy Backend to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          source: "backend/*"
+          target: "/var/www/bksanskar.in/backend"
+          strip_components: 1
 
       - name: Post-deployment SSH Commands
         uses: appleboy/ssh-action@v1.0.3
@@ -42,8 +53,8 @@ jobs:
           username: ${{ secrets.VPS_USERNAME }}
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
-            cd /var/www/html/sanskar_school/backend
+            cd /var/www/bksanskar.in/backend
             # Install backend dependencies
             npm install --production
             # Restart backend using PM2
-            pm2 restart sanskar_backend || pm2 start server.js --name "sanskar_backend"
+            pm2 restart sanskar-api || pm2 start server.js --name "sanskar-api"

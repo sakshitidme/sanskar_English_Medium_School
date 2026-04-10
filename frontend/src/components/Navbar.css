@@ -1,58 +1,82 @@
-/* 3D Movable School Name */
+/* School name hover effect */
 .school-name {
-  perspective: 1000px;
-  transform-style: preserve-3d;
   transition: transform 0.3s ease;
 }
 
 .school-name:hover {
-  transform: rotateY(10deg) rotateX(5deg) scale(1.05);
-  text-shadow: 0 2px 8px rgba(255,255,255,0.7);
+  transform: scale(1.05);
 }
 
-/* Liquid hover effect for menu buttons */
+/* Menu button base styles */
 .menu-btn {
   position: relative;
-  overflow: hidden;
+  padding: 6px 12px;
   transition: color 0.3s ease;
 }
 
-.menu-btn:hover {
-  color: #ffeb3b; /* bright yellow on hover */
-}
-
+/* Liquid effect (subtle sky blue, not yellow) */
 .menu-btn .liquid {
-  content: "";
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: rgba(255, 235, 59, 0.3);
-  border-radius: 50%;
+  inset: 0;
+  background: rgba(56, 189, 248, 0.15);
+  border-radius: 999px;
   transform: scale(0);
-  transition: transform 0.5s ease;
+  transition: transform 0.4s ease;
   pointer-events: none;
+  z-index: -1;
 }
 
 .menu-btn:hover .liquid {
   transform: scale(1);
-  animation: liquidMove 0.6s ease-out;
 }
 
-@keyframes liquidMove {
-  0% {
-    transform: scale(0.5) translate(0, 0);
-    opacity: 0.5;
-  }
-  50% {
-    transform: scale(1.2) translate(10px, -10px);
-    opacity: 0.3;
-  }
-  100% {
-    transform: scale(1) translate(0, 0);
-    opacity: 0;
-  }
+/* Active state should not show liquid effect */
+.menu-btn.bg-\[#1A4D8D\] .liquid {
+  display: none;
 }
 
- 
+/* Smooth color transitions */
+.menu-btn:not(.bg-\[#1A4D8D\]):hover {
+  color: #1A4D8D;
+}
+
+/* Dropdown animations */
+.dropdown-enter {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.dropdown-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.dropdown-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dropdown-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+@keyframes spin-slow-very {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow-very {
+  animation: spin-slow-very 20s linear infinite;
+}
+
+.marathi-verse {
+  font-family: 'Martel', serif;
+  color: #000000; /* Black */
+  text-shadow: 0.5px 0.5px 0px rgba(0,0,0,0.1);
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(230, 81, 0, 0.2);
+  padding-bottom: 1px;
+}

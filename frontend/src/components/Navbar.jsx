@@ -69,7 +69,7 @@ const Navbar = () => {
           <div className="flex flex-col items-start justify-center">
             {/* Smaller registration text */}
             <div className="flex flex-col items-start leading-tight -mt-3">
-              <span className="text-[6px] md:text-[6px] font-bold marathi-verse mt-0.5">
+              <span className="text-[6px] md:text-[6px] font-bold text-red-600 marathi-verse mt-0.5">
                 | नही ज्ञानेन सदृशं पवित्रमिह विद्यते |
               </span>
               <span className="text-[10px] md:text-[10px] font-bold opacity-80 mt-0.5">
@@ -119,7 +119,8 @@ const Navbar = () => {
                 >
                     <div className="bg-white/60 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] rounded-2xl border border-white/40 overflow-hidden py-2 ring-1 ring-black/5">
                       <DropdownItem to="/about/educators" closeMenu={closeAbout} icon="👩‍🏫">Our Educators</DropdownItem>
-                      <DropdownItem to="/about/trust" closeMenu={closeAbout} icon="🤝">Trust</DropdownItem>
+                      <DropdownItem to="/about/secretary" closeMenu={closeAbout} icon="👤">Secretary's Profile</DropdownItem>
+                      <DropdownItem to="/about/trust" closeMenu={closeAbout} icon="🤝">Trustees</DropdownItem>
                       <DropdownItem to="/about/infrastructure" closeMenu={closeAbout} icon="🏫">Infrastructure</DropdownItem>
                       <DropdownItem to="/reviews" closeMenu={closeAbout} icon="💬">Testimonials</DropdownItem>
                     </div>
@@ -239,7 +240,8 @@ const Navbar = () => {
             {aboutOpen && (
               <div className="pl-4 space-y-3 border-l-2 border-[#FFC107] py-1">
                 <MobileLink to="/about/educators" onClick={() => setMenuOpen(false)} small>Our Educators</MobileLink>
-                <MobileLink to="/about/trust" onClick={() => setMenuOpen(false)} small>Trust</MobileLink>
+                <MobileLink to="/about/secretary" onClick={() => setMenuOpen(false)} small>Secretary's Profile</MobileLink>
+                <MobileLink to="/about/trust" onClick={() => setMenuOpen(false)} small>Trustees</MobileLink>
                 <MobileLink to="/about/infrastructure" onClick={() => setMenuOpen(false)} small>Infrastructure</MobileLink>
                 <MobileLink to="/reviews" onClick={() => setMenuOpen(false)} small>Testimonials</MobileLink>
               </div>

@@ -50,7 +50,7 @@ const Trust = () => {
               { name: "Shri. Santosh Kondaji Bhadange", role: "Member", color: "border-orange-500", light: "bg-orange-50" },
               { name: "Smt. Sangeeta Anil Bhadange", role: "Member", color: "border-cyan-500", light: "bg-cyan-50" },
               { name: "Shri. Avadhoot Madhukar Gaikwad", role: "Member", color: "border-teal-500", light: "bg-teal-50" },
-              { name: "Mr. Nilesh Mohan Revgade", role: "Member", color: "border-rose-500", light: "bg-rose-50" }
+              { name: "Mr. Khanderao Shivram Salve", role: "Member", color: "border-rose-500", light: "bg-rose-50" }
             ].map((member, idx) => (
               <motion.div
                 key={idx}

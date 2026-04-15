@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import Educators from "./pages/Educators";
 import Infrastructure from "./pages/Infrastructure";
 import Trust from "./pages/Trust";
+import Secretary from "./pages/Secretary";
 import PrincipalDesk from "./pages/PrincipalDesk";
 import CbseAdmissions from "./pages/CbseAdmissions";
 import Reviews from "./pages/Reviews";
@@ -82,7 +83,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about/educators" element={<Educators />} />
-          <Route path="/about/infrastructure" element={<Infrastructure />} />
+          <Route path="/about/secretary" element={<Secretary />} />
           <Route path="/about/trust" element={<Trust />} />
           <Route path="/events" element={<Events />} />
           <Route path="/principal-desk" element={<PrincipalDesk />} />

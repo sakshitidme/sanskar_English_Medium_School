@@ -195,14 +195,14 @@ const Footer = () => {
                 let mainHref = "";
                 if (info.title === "Location") mainHref = info.link;
                 if (info.title === "Call Now") mainHref = `tel:${mainContent.replace(/[\s-]/g, "")}`;
-                if (info.title === "Email Us") mainHref = `mailto:${mainContent}`;
+                if (info.title === "Email Us") mainHref = `https://mail.google.com/mail/?view=cm&fs=1&to=${mainContent}`;
 
                 return (
                   <li key={i}>
                     <a 
                       href={mainHref}
-                      target={info.title === "Location" ? "_blank" : undefined}
-                      rel={info.title === "Location" ? "noopener noreferrer" : undefined}
+                      target={info.title === "Location" || info.title === "Email Us" ? "_blank" : undefined}
+                      rel={info.title === "Location" || info.title === "Email Us" ? "noopener noreferrer" : undefined}
                       className="flex gap-4 group items-start p-3 -m-3 rounded-2xl hover:bg-white/5 transition-all duration-300 pointer-events-auto"
                     >
                       <div className={`w-10 h-10 bg-white/10 rounded-xl flex-shrink-0 flex items-center justify-center ${info.color} group-hover:scale-110 transition-transform duration-300 shadow-lg`}>

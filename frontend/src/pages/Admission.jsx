@@ -50,7 +50,7 @@ const Admission = () => {
 
   // OTP States
   const [feeStatus, setFeeStatus] = useState("unpaid");
-  const REGISTRATION_FEE = 1; // ₹1 for trial
+  const REGISTRATION_FEE = 100; // ₹100 for admission registration
   const [otpStatus, setOtpStatus] = useState({
     isSent: false,
     isVerified: false,
@@ -60,6 +60,13 @@ const Admission = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [topError, setTopError] = useState(''); // floating top-center error
+
+  const showError = (msg) => {
+    setTopError(msg);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => setTopError(''), 5000);
+  };
 
   // Payment States
   const [paymentStatus, setPaymentStatus] = useState({
@@ -85,7 +92,7 @@ const Admission = () => {
   const handlePayment = async () => {
     // 1. Basic Validation for prefill
     if (!formData.phone || formData.phone.length < 10) {
-      alert("Please enter a valid phone number before payment.");
+      showError("Please enter a valid phone number before payment.");
       return;
     }
 
@@ -93,7 +100,7 @@ const Admission = () => {
     const res = await loadRazorpay();
 
     if (!res) {
-      alert('Razorpay SDK failed to load. Are you online?');
+      showError('Razorpay SDK failed to load. Are you online?');
       setPaymentStatus(prev => ({ ...prev, loading: false }));
       return;
     }
@@ -165,8 +172,8 @@ const Admission = () => {
   const handleFile = (file, fieldName) => {
     if (file && file.type.startsWith('image/')) {
       const fileSizeKiloBytes = file.size / 1024;
-      if (fileSizeKiloBytes < 80 || fileSizeKiloBytes > 200) {
-        alert("File size must be between 80KB and 200KB.");
+      if (fileSizeKiloBytes > 1024) {
+        alert("File size must not exceed 1MB.");
         return;
       }
       setFormData(prev => ({ ...prev, [fieldName]: file }));
@@ -296,7 +303,12 @@ const Admission = () => {
           if (totalMonths >= 24 && totalMonths < 36) suggestedGrade = 'Playgroup';
           else if (totalMonths >= 36 && totalMonths < 48) suggestedGrade = 'Nursery';
           else if (totalMonths >= 48 && totalMonths < 60) suggestedGrade = 'Junior KG';
-          else if (totalMonths >= 60 && totalMonths < 78) suggestedGrade = 'Senior KG';
+          else if (totalMonths >= 60 && totalMonths < 72) suggestedGrade = 'Senior KG';
+          else if (totalMonths >= 72 && totalMonths < 84) suggestedGrade = 'Grade 1';
+          else if (totalMonths >= 84 && totalMonths < 96) suggestedGrade = 'Grade 2';
+          else if (totalMonths >= 96 && totalMonths < 108) suggestedGrade = 'Grade 3';
+          else if (totalMonths >= 108 && totalMonths < 120) suggestedGrade = 'Grade 4';
+          else if (totalMonths >= 120) suggestedGrade = 'Grade 5';
 
           if (suggestedGrade) {
             newFormData.grade = suggestedGrade;
@@ -318,7 +330,9 @@ const Admission = () => {
   };
 
   const handleSendOtp = async () => {
-    if (!formData.phone || formData.phone.length < 10) {
+    // Basic phone number validation for 10 exact digits
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!formData.phone || !phoneRegex.test(formData.phone)) {
       alert("Please enter a valid 10-digit phone number.");
       return;
     }
@@ -372,17 +386,17 @@ const Admission = () => {
     
     // 1. Strict Name Validation
     if (!validateNames()) {
-      alert("Form contains validation errors. Please check the highlights.");
+      showError("Form contains validation errors. Please check the highlighted fields.");
       return;
     }
 
     // 2. Payment Verification Check
     if (!paymentStatus.isPaid) {
-      alert("Please complete the Admission Registration Fee payment before submitting the form.");
+      showError("Please complete the Admission Registration Fee payment before submitting the form.");
       return;
     }
 
-    // 2. Comprehensive Mandatory Field Check
+    // 3. Comprehensive Mandatory Field Check
     const mandatoryFields = [
       'studentSurname', 'studentFirstName', 'studentMiddleName',
       'fatherSurname', 'fatherFirstName', 'fatherMiddleName', 'fatherEducation',
@@ -393,12 +407,12 @@ const Admission = () => {
 
     const missingFields = mandatoryFields.filter(field => !formData[field]);
     if (missingFields.length > 0) {
-      alert("Please fill in all mandatory fields (marked with *).");
+      showError("Please fill in all mandatory fields (marked with *).");
       return;
     }
 
     if (!otpStatus.isVerified) {
-      alert("Please verify your phone number with OTP first.");
+      showError("Please verify your phone number with OTP first.");
       return;
     }
 
@@ -442,8 +456,7 @@ const Admission = () => {
 
       setSavedAdmission(saved);
       setSubmitSuccess(true);
-      alert("Success! Admission Inquiry and Payment recorded. You can now download your application form.");
-      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       // Removed immediate redirect to allow download
       // setTimeout(() => navigate('/contact'), 3000);
     } catch (error) {
@@ -456,6 +469,22 @@ const Admission = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-32 pb-12 px-4 sm:px-6 lg:px-8 pencil-cursor">
+      {/* Floating top-center error banner */}
+      <AnimatePresence>
+        {topError && (
+          <motion.div
+            initial={{ opacity: 0, y: -60 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -60 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-[9999] bg-red-600 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 max-w-md w-[90%] text-sm font-bold"
+          >
+            <span className="text-xl">⚠️</span>
+            <span>{topError}</span>
+            <button onClick={() => setTopError('')} className="ml-auto text-white/80 hover:text-white text-lg leading-none">✕</button>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <SEO 
         title="Admission"
         description="Admission open for 2026-27. Apply now for Nursery to Grade 10 at Sanskar English Medium School."
@@ -603,15 +632,22 @@ const Admission = () => {
                   />
                 </div>
                 <div>
-                  <input
-                    type="text"
+                  <select
                     name="fatherEducation"
                     value={formData.fatherEducation}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 rounded-lg border border-blue-200 focus:border-[#FFC107] focus:outline-none focus:ring-1 focus:ring-[#FFC107] transition-colors text-sm font-bold placeholder:text-gray-400"
-                    placeholder="EDUCATION"
-                  />
+                    className="w-full px-4 py-2 rounded-lg border border-blue-200 focus:border-[#FFC107] focus:outline-none focus:ring-1 focus:ring-[#FFC107] transition-colors text-sm font-bold bg-white text-gray-700"
+                  >
+                    <option value="" disabled>EDUCATION</option>
+                    <option value="Primary Education">Primary Education</option>
+                    <option value="Secondary Education">Secondary Education</option>
+                    <option value="SSC">SSC</option>
+                    <option value="HSC">HSC</option>
+                    <option value="Graduation">Graduation</option>
+                    <option value="Post Graduation">Post Graduation</option>
+                    <option value="Illiterate">Illiterate</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -655,15 +691,23 @@ const Admission = () => {
                   />
                 </div>
                 <div>
-                  <input
-                    type="text"
+                  <select
                     name="motherEducation"
                     value={formData.motherEducation}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 rounded-lg border border-blue-200 focus:border-[#FFC107] focus:outline-none focus:ring-1 focus:ring-[#FFC107] transition-colors text-sm font-bold placeholder:text-gray-400"
-                    placeholder="EDUCATION"
-                  />
+                    className="w-full px-4 py-2 rounded-lg border border-blue-200 focus:border-[#FFC107] focus:outline-none focus:ring-1 focus:ring-[#FFC107] transition-colors text-sm font-bold bg-white text-gray-700"
+                  >
+                    <option value="" disabled>EDUCATION</option>
+                    <option value="Primary Education">Primary Education</option>
+                    <option value="Secondary Education">Secondary Education</option>
+                    <option value="SSC">SSC</option>
+                    <option value="HSC">HSC</option>
+                    <option value="Graduation">Graduation</option>
+                    <option value="Post Graduation">Post Graduation</option>
+                    <option value="Illiterate">Illiterate</option>
+                    <option value="Housewife">Housewife</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -786,110 +830,12 @@ const Admission = () => {
                   <option value="OBC">OBC</option>
                   <option value="SC">SC</option>
                   <option value="ST">ST</option>
-                  <option value="NT/DT">NT/DT</option>
+                  <option value="NT/DT">VJNT</option>
                   <option value="Other">Other</option>
                 </select>
               </div>
             </div>
 
-            {/* Grid for Email and Phone */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="email" className="block text-[#1A4D8D] font-bold text-sm mb-1 uppercase tracking-tight flex flex-col">
-                  <span>Email Address <span className="text-red-500">*</span></span>
-                  <span className="text-[10px] text-blue-400 font-bold lowercase italic opacity-80 mt-0.5">keep this optional</span>
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg border border-blue-100 focus:border-[#FFC107] focus:outline-none focus:ring-2 focus:ring-[#FFC107]/20 transition-all text-sm font-bold shadow-sm"
-                  placeholder="your@email.com"
-                />
-              </div>
-
-              <div className="space-y-4">
-                <div className="relative">
-                  <label htmlFor="phone" className="block text-[#1A4D8D] font-bold text-sm mb-1 uppercase tracking-tight flex items-center gap-2">
-                    <Smartphone size={16} /> Phone Number <span className="text-red-500">*</span>
-                  </label>
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <div className="relative flex-1">
-                      <input
-                        type="tel"
-                        id="phone"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        required
-                        disabled={otpStatus.isVerified}
-                        className={`w-full px-4 py-3 rounded-lg border focus:outline-none transition-all text-sm font-bold pr-10 ${
-                          otpStatus.isVerified ? 'border-green-500 bg-green-50 shadow-inner' : 'border-blue-200 focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 shadow-sm'
-                        }`}
-                        placeholder="10-digit Mobile Number"
-                      />
-                      {otpStatus.isVerified && (
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-600">
-                          <CheckCircle size={20} />
-                        </span>
-                      )}
-                    </div>
-                    {!otpStatus.isVerified && (
-                      <button
-                        type="button"
-                        onClick={handleSendOtp}
-                        disabled={!otpStatus.canResend || !formData.phone || formData.phone.length < 10}
-                        className={`px-6 py-3 rounded-lg font-bold text-sm transition-all shadow-md active:scale-95 whitespace-nowrap min-w-[140px] ${
-                          !otpStatus.canResend
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200' 
-                            : 'bg-[#1A4D8D] text-white hover:bg-[#0E4D92] hover:shadow-lg'
-                        }`}
-                      >
-                        {otpStatus.timer > 0 ? `Resend In ${otpStatus.timer}s` : 'Send OTP'}
-                      </button>
-                    )}
-                  </div>
-
-                  {/* OTP Verification UI Fixes */}
-                  <AnimatePresence>
-                    {otpStatus.isSent && !otpStatus.isVerified && (
-                      <motion.div 
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="mt-4 p-4 bg-blue-50/50 rounded-xl border border-blue-200 backdrop-blur-sm overflow-hidden"
-                      >
-                         <div className="text-center mb-3">
-                          <p className="text-xs md:text-sm text-blue-800 font-bold uppercase tracking-tight break-words px-2 leading-relaxed">
-                            Verification SMS Sent to <span className="text-[#0E4D92]">{formData.phone}</span>
-                          </p>
-                          <p className="text-[10px] text-blue-500 mt-1 font-medium">Please enter the 6-digit code</p>
-                        </div>
-                        <div className="flex flex-col sm:flex-row gap-3">
-                          <input
-                            type="text"
-                            maxLength="6"
-                            value={otpStatus.input}
-                            onChange={(e) => setOtpStatus({ ...otpStatus, input: e.target.value.replace(/\D/g, '') })}
-                            className="flex-1 px-4 py-3 rounded-lg border border-blue-200 focus:border-[#FFC107] focus:outline-none text-center tracking-[0.8em] font-bold text-xl shadow-sm bg-white"
-                            placeholder="000000"
-                          />
-                          <button
-                            type="button"
-                            onClick={handleVerifyOtp}
-                            className="bg-[#FFC107] text-[#1A4D8D] px-4 sm:px-8 py-3 rounded-lg font-black text-xs sm:text-sm hover:bg-[#FFB300] transition-all shadow-md active:scale-95 uppercase flex items-center justify-center min-w-[80px]"
-                          >
-                            Verify
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
-            </div>
 
             {/* Photo Uploads Grid */}
             <div className="pt-10 pb-6 border-t border-blue-50 mt-4">
@@ -1095,6 +1041,111 @@ const Admission = () => {
                 />
               </div>
             </div>
+            {/* Grid for Email and Phone */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-6">
+              <div>
+                <label htmlFor="email" className="block text-[#1A4D8D] font-bold text-sm mb-1 uppercase tracking-tight flex flex-col">
+                  <span>Email Address <span className="text-red-500">*</span></span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 rounded-lg border border-blue-100 focus:border-[#FFC107] focus:outline-none focus:ring-2 focus:ring-[#FFC107]/20 transition-all text-sm font-bold shadow-sm"
+                  placeholder="your@email.com"
+                />
+              </div>
+
+              <div className="space-y-4">
+                <div className="relative">
+                  <label htmlFor="phone" className="block text-[#1A4D8D] font-bold text-sm mb-1 uppercase tracking-tight flex items-center gap-2">
+                    <Smartphone size={16} /> Phone Number <span className="text-red-500">*</span>
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <div className="relative flex-1">
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, ''); // Allow only digits
+                          if (val.length <= 10) {
+                            handleChange({ target: { name: 'phone', value: val } });
+                          }
+                        }}
+                        required
+                        maxLength="10"
+                        pattern="[0-9]{10}"
+                        disabled={otpStatus.isVerified}
+                        className={`w-full px-4 py-3 rounded-lg border focus:outline-none transition-all text-sm font-bold pr-10 ${
+                          otpStatus.isVerified ? 'border-green-500 bg-green-50 shadow-inner' : 'border-blue-200 focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 shadow-sm'
+                        }`}
+                        placeholder="10-digit Mobile Number"
+                      />
+                      {otpStatus.isVerified && (
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-600">
+                          <CheckCircle size={20} />
+                        </span>
+                      )}
+                    </div>
+                    {!otpStatus.isVerified && (
+                      <button
+                        type="button"
+                        onClick={handleSendOtp}
+                        disabled={!otpStatus.canResend || !formData.phone || formData.phone.length < 10}
+                        className={`px-6 py-3 rounded-lg font-bold text-sm transition-all shadow-md active:scale-95 whitespace-nowrap min-w-[140px] ${
+                          !otpStatus.canResend
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200' 
+                            : 'bg-[#1A4D8D] text-white hover:bg-[#0E4D92] hover:shadow-lg'
+                        }`}
+                      >
+                        {otpStatus.timer > 0 ? `Resend In ${otpStatus.timer}s` : 'Send OTP'}
+                      </button>
+                    )}
+                  </div>
+
+                  {/* OTP Verification UI Fixes */}
+                  <AnimatePresence>
+                    {otpStatus.isSent && !otpStatus.isVerified && (
+                      <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="mt-4 p-4 bg-blue-50/50 rounded-xl border border-blue-200 backdrop-blur-sm overflow-hidden"
+                      >
+                         <div className="text-center mb-3">
+                          <p className="text-xs md:text-sm text-blue-800 font-bold uppercase tracking-tight break-words px-2 leading-relaxed">
+                            Verification SMS Sent to <span className="text-[#0E4D92]">{formData.phone}</span>
+                          </p>
+                          <p className="text-[10px] text-blue-500 mt-1 font-medium">Please enter the 6-digit code</p>
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-3">
+                          <input
+                            type="text"
+                            maxLength="6"
+                            value={otpStatus.input}
+                            onChange={(e) => setOtpStatus({ ...otpStatus, input: e.target.value.replace(/\D/g, '') })}
+                            className="flex-1 px-4 py-3 rounded-lg border border-blue-200 focus:border-[#FFC107] focus:outline-none text-center tracking-[0.8em] font-bold text-xl shadow-sm bg-white"
+                            placeholder="000000"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleVerifyOtp}
+                            className="bg-[#FFC107] text-[#1A4D8D] px-4 sm:px-8 py-3 rounded-lg font-black text-xs sm:text-sm hover:bg-[#FFB300] transition-all shadow-md active:scale-95 uppercase flex items-center justify-center min-w-[80px]"
+                          >
+                            Verify
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            </div>
 
             {/* Registration Fee Section */}
             <div className="pt-8 border-t border-blue-100">
@@ -1111,7 +1162,7 @@ const Admission = () => {
                 
                 <div className="flex items-center gap-4 w-full md:w-auto">
                   <div className="text-center md:text-right px-4">
-                      <span className="text-3xl font-black text-slate-900">₹1.00</span>
+                      <span className="text-3xl font-black text-slate-900">₹{REGISTRATION_FEE}.00</span>
                     <span className="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Inclusive of taxes</span>
                   </div>
                   

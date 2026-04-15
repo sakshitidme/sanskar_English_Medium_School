@@ -7,7 +7,7 @@ import { CheckCircle, BookOpen, Briefcase, FileText, Activity } from "lucide-rea
 import playgroupImg from "../assets/images/home/hero/playgroup.png";
 import nurseryImg from "../assets/images/home/hero/nursery.png";
 import jrKgImg from "../assets/images/home/hero/jr.kg.png";
-import srKgImg from "../assets/images/home/hero/sr.jk.png";
+import srKgImg from "../assets/images/home/hero/sr_kg_new.jpg";
 
 const CbseAdmissions = () => {
   const classesData = [
@@ -109,7 +109,7 @@ const CbseAdmissions = () => {
                         <img 
                           src={program.image} 
                           alt={program.title} 
-                          className="w-full h-full object-cover object-[center_top] sm:object-cover transition-transform duration-700 group-hover:scale-110"
+                          className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0b2a4a]/90 via-black/20 to-transparent"></div>
                         <div className="absolute bottom-4 left-4">

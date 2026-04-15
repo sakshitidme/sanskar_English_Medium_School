@@ -1,4 +1,5 @@
 import Admission from '../models/Admission.js';
+import { sendEmail } from '../utils/sendEmail.js';
 
 // @desc    Get all admissions
 // @route   GET /api/admissions
@@ -25,9 +26,14 @@ export const createAdmission = async (req, res) => {
   } = req.body;
 
   try {
-    // 1. Check for missing primary fields (Email is now optional)
-    if (!student_surname || !student_first_name || !student_middle_name || !dob || !phone || !category || !grade) {
-      return res.status(400).json({ message: 'All primary fields are mandatory.' });
+    // 1. Check for missing primary fields (Email is now required)
+    if (!student_surname || !student_first_name || !student_middle_name || !dob || !phone || !email || !category || !grade) {
+      return res.status(400).json({ message: 'All primary fields (including EMail) are mandatory.' });
+    }
+
+    // Strictly validate 10-digit phone
+    if (!/^[0-9]{10}$/.test(phone)) {
+      return res.status(400).json({ message: 'Phone number must be exactly 10 digits.' });
     }
 
     if (!form_data) {
@@ -71,6 +77,27 @@ export const createAdmission = async (req, res) => {
     }
 
     const newAdmission = await Admission.create(req.body);
+
+    // Send Confirmation Email
+    if (email) {
+      const emailSubject = `Welcome to Sanskar English Medium School - Admission Received`;
+      const emailHtml = `
+      <h3>Dear Mr. ${fatherFirstName} ${fatherSurname} / Mrs. ${motherFirstName} ${motherSurname},</h3>
+      <p>Thank you for taking admission to <strong>Sanskar English Medium School</strong> for child <strong>${student_first_name} ${student_surname}</strong> in class <strong>${grade}</strong>.</p>
+      <p>Our team will review your application and get back to you soon.</p>
+      <br />
+      <p>Regards,</p>
+      <p><strong>Prof. Kishor Nivrutti Yelmame</strong><br/>Principal, Sanskar School</p>
+      `;
+      
+      // Sending email asynchronously without awaiting to prevent delaying the API response
+      sendEmail({
+        to: email,
+        subject: emailSubject,
+        html: emailHtml,
+      });
+    }
+
     res.status(201).json(newAdmission);
   } catch (error) {
     console.error('Admission Creation Error:', error);

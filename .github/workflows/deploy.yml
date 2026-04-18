@@ -26,26 +26,28 @@ jobs:
         working-directory: ./frontend
         run: npm run build
 
+      # ✅ FIXED FRONTEND DEPLOY
       - name: Deploy Frontend to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           password: ${{ secrets.VPS_PASSWORD }}
-          source: "frontend/dist/*"
+          source: "frontend/dist"   # 👈 agar Vite hai
+          # source: "frontend/build"  # 👈 agar CRA hai
           target: "/var/www/bksanskar.in/public_html"
-          strip_components: 2
 
+      # ✅ FIXED BACKEND DEPLOY
       - name: Deploy Backend to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           password: ${{ secrets.VPS_PASSWORD }}
-          source: "backend/*"
-          target: "/var/www/bksanskar.in/backend"
-          strip_components: 1
+          source: "backend"
+          target: "/var/www/bksanskar.in"
 
+      # ✅ SSH COMMANDS
       - name: Post-deployment SSH Commands
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -54,7 +56,5 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
             cd /var/www/bksanskar.in/backend
-            # Install backend dependencies
             npm install --production
-            # Restart backend using PM2
             pm2 restart sanskar-api || pm2 start server.js --name "sanskar-api"

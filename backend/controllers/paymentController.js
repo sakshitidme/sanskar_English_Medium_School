@@ -191,10 +191,12 @@ export const getPaymentStatus = async (req, res) => {
   try {
     // Fetch payments associated with the order
     const payments = await razorpay.orders.fetchPayments(orderId);
-    // Find a captured payment
-    const captured = payments.items?.find(p => p.status === 'captured');
+    // Find a captured or authorized payment
+    const captured = payments.items?.find(p => p.status === 'captured' || p.status === 'authorized');
+    console.log(`[Polling] Order ${orderId} - Payments count: ${payments.items?.length || 0}. Status: ${captured ? captured.status : 'pending'}`);
+    
     if (captured) {
-      return res.json({ success: true, paid: true, paymentId: captured.id });
+      return res.json({ success: true, paid: true, paymentId: captured.id, status: captured.status });
     }
     
     // Check if any payment attempt failed

@@ -24,8 +24,11 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // Middleware
+// Razorpay webhook needs raw body for signature verification
+app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
 app.use(cors());
 app.use(express.json());
+
 
 // Routes
 app.use('/api/auth', authRoutes);

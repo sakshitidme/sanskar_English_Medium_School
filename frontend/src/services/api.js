@@ -123,7 +123,7 @@ export const api = {
     method: 'POST',
     body: JSON.stringify(paymentData)
   }),
-  getPaymentDetails: (id) => fetchApi(`/payment/${id}`),
+  getPaymentStatus: (orderId) => fetchApi(`/payment/status/${orderId}`),
   searchPayments: (studentData) => fetchApi('/payment/search', {
     method: 'POST',
     body: JSON.stringify(studentData)

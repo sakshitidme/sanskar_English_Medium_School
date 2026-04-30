@@ -135,3 +135,70 @@ export const getPaymentsByStudent = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server Error' });
   }
 };
+
+// @desc    Razorpay webhook handler
+// @route   POST /api/payment/webhook
+// @access  Public (Webhook)
+export const handleRazorpayWebhook = async (req, res) => {
+  const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+  const signature = req.headers['x-razorpay-signature'];
+  const payload = req.body.toString(); // raw buffer to string
+
+  // Verify signature
+  const expectedSignature = crypto
+    .createHmac('sha256', webhookSecret)
+    .update(payload)
+    .digest('hex');
+
+  if (expectedSignature !== signature) {
+    console.warn('Invalid Razorpay webhook signature');
+    return res.status(400).json({ success: false, message: 'Invalid signature' });
+  }
+
+  let data;
+  try {
+    const parsed = JSON.parse(payload);
+    data = parsed.payload;
+    const event = parsed.event;
+    // Extract entity based on event type
+    let entity;
+    if (event === 'payment.captured') {
+      entity = data.payment?.entity;
+    } else if (event === 'qr_code.credited') {
+      entity = data.qr_code?.entity;
+    } else {
+      return res.status(200).json({ success: true, message: 'Event ignored' });
+    }
+    if (!entity) {
+      return res.status(400).json({ success: false, message: 'No entity data' });
+    }
+    const paymentId = entity.id;
+    const update = {
+      status: entity.status,
+      method: entity.method,
+      amount: entity.amount ? entity.amount / 100 : undefined,
+    };
+    // Update payment record if exists
+    await Payment.findOneAndUpdate({ razorpay_payment_id: paymentId }, update, { new: true, upsert: false });
+    return res.json({ success: true, message: 'Webhook processed' });
+  } catch (err) {
+    console.error('Webhook handling error', err);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+export const getPaymentStatus = async (req, res) => {
+  const { orderId } = req.params;
+  try {
+    // Fetch payments associated with the order
+    const payments = await razorpay.orders.fetchPayments(orderId);
+    // Find a captured payment
+    const captured = payments.items?.find(p => p.status === 'captured');
+    if (captured) {
+      return res.json({ success: true, paid: true, paymentId: captured.id });
+    }
+    return res.json({ success: true, paid: false });
+  } catch (error) {
+    console.error('Error fetching payment status:', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+};

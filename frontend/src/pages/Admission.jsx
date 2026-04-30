@@ -109,6 +109,30 @@ const Admission = () => {
       // 2. Create Order on Backend
       const orderData = await api.createPaymentOrder(REGISTRATION_FEE);
       const { order } = orderData;
+      const orderId = order.id;
+
+      // 3. Start polling for QR payment status (if QR is used)
+      let pollCount = 0;
+      const maxPoll = 200; // approx 10 minutes (200 * 3s)
+      const pollInterval = setInterval(async () => {
+        if (pollCount >= maxPoll) {
+          clearInterval(pollInterval);
+          setPaymentStatus(prev => ({ ...prev, loading: false }));
+          showError('Payment timeout. Please try again.');
+          return;
+        }
+        pollCount++;
+        try {
+          const statusRes = await api.getPaymentStatus(orderId);
+          if (statusRes.paid) {
+            clearInterval(pollInterval);
+            setPaymentStatus({ isPaid: true, transactionId: statusRes.paymentId, loading: false });
+            alert('Payment captured via QR!');
+          }
+        } catch (err) {
+          console.error('Polling error:', err);
+        }
+      }, 3000);
 
       const options = {
         key: 'rzp_live_SUYpNkNbUNgC9A', // Live Key provided by user
@@ -117,21 +141,22 @@ const Admission = () => {
         name: "Sanskar English Medium School",
         description: "Admission Registration Fee",
         image: "/logo.png",
-        order_id: order.id,
+        order_id: orderId,
+        // For QR flow, the handler may not be called. It will still work for card/UPI.
         handler: async function (response) {
           try {
-            // 3. Verify Payment on Backend
+            // 4. Verify Payment on Backend
             const verifyData = await api.verifyPayment({
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
-              // Pass customer details for record keeping
               name: `${formData.studentFirstName} ${formData.studentSurname}`,
               phone: formData.phone,
               email: formData.email
             });
 
             if (verifyData.success) {
+              clearInterval(pollInterval);
               setPaymentStatus({
                 isPaid: true,
                 transactionId: response.razorpay_payment_id,

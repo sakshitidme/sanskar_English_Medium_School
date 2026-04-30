@@ -123,7 +123,7 @@ export const api = {
     method: 'POST',
     body: JSON.stringify(paymentData)
   }),
-  getPaymentStatus: (orderId) => fetchApi(`/payment/status/${orderId}`),
+  getPaymentStatus: (orderId) => fetchApi(`/payment/status/${orderId}`, { cache: 'no-store' }),
   searchPayments: (studentData) => fetchApi('/payment/search', {
     method: 'POST',
     body: JSON.stringify(studentData)

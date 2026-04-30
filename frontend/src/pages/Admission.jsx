@@ -128,6 +128,10 @@ const Admission = () => {
             clearInterval(pollInterval);
             setPaymentStatus({ isPaid: true, transactionId: statusRes.paymentId, loading: false });
             alert('Payment captured via QR!');
+          } else if (statusRes.failed) {
+            clearInterval(pollInterval);
+            setPaymentStatus(prev => ({ ...prev, loading: false }));
+            showError('Payment failed or cancelled. Please try again.');
           }
         } catch (err) {
           console.error('Polling error:', err);

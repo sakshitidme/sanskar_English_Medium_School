@@ -196,7 +196,14 @@ export const getPaymentStatus = async (req, res) => {
     if (captured) {
       return res.json({ success: true, paid: true, paymentId: captured.id });
     }
-    return res.json({ success: true, paid: false });
+    
+    // Check if any payment attempt failed
+    const failed = payments.items?.find(p => p.status === 'failed');
+    if (failed) {
+      return res.json({ success: true, paid: false, failed: true, message: 'Payment failed' });
+    }
+
+    return res.json({ success: true, paid: false, failed: false });
   } catch (error) {
     console.error('Error fetching payment status:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
